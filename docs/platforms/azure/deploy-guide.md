@@ -66,14 +66,14 @@ az cognitiveservices account create \
   --sku S0
 ```
 
-Deploy a model (e.g., gpt-4o-mini):
+Deploy a model (e.g., gpt-5.2):
 
 ```bash
 az cognitiveservices account deployment create \
   --name $OPENAI_NAME \
   --resource-group $RESOURCE_GROUP \
-  --deployment-name "gpt-4o-mini" \
-  --model-name "gpt-4o-mini" \
+  --deployment-name "gpt-5.2" \
+  --model-name "gpt-5.2" \
   --model-version "2024-07-18" \
   --model-format OpenAI \
   --sku-capacity 10 \
@@ -154,7 +154,7 @@ ENV NODE_ENV=production
 # Create config directory and bake in Azure-specific config
 # IMPORTANT: trustedProxies is required for Azure's internal proxy
 RUN mkdir -p /home/node/.moltbot && \
-  echo '{"gateway":{"controlUi":{"allowInsecureAuth":true},"trustedProxies":["169.254.0.0/16"]},"agents":{"defaults":{"model":{"primary":"azure-openai/gpt-4o-mini"}}}}' > /home/node/.moltbot/moltbot.json && \
+  echo '{"gateway":{"controlUi":{"allowInsecureAuth":true},"trustedProxies":["169.254.0.0/16"]},"agents":{"defaults":{"model":{"primary":"azure-openai/gpt-5.2"}}}}' > /home/node/.moltbot/moltbot.json && \
     chown -R node:node /home/node/.moltbot
 
 USER node
@@ -232,6 +232,7 @@ az webapp config appsettings set \
     MOLTBOT_CONFIG_PATH=/home/node/.moltbot/moltbot.json \
     CLAWDBOT_GATEWAY_TOKEN=$GATEWAY_TOKEN \
     AZURE_OPENAI_API_KEY="<your-azure-openai-key>" \
+    AZURE_OPENAI_DEPLOYMENT_NAME="gpt-5.2" \
     AZURE_OPENAI_ENDPOINT="https://<your-resource>.openai.azure.com/" \
     AZURE_OPENAI_API_VERSION="2024-08-01-preview"
 
@@ -283,7 +284,7 @@ az webapp log download \
 Look for these indicators in the logs:
 
 ```
-[gateway] agent model: azure-openai/gpt-4o-mini
+[gateway] agent model: azure-openai/gpt-5.2
 [gateway] listening on 0.0.0.0:18789
 ```
 
@@ -337,7 +338,7 @@ az webapp config set -g $RESOURCE_GROUP -n $WEB_APP_NAME \
 ### Problem: Azure OpenAI Not Working
 
 **Verify**:
-1. Model deployment name matches config (e.g., `gpt-4o-mini`)
+1. Model deployment name matches config (e.g., `gpt-5.2`)
 2. API key is correct
 3. Endpoint URL format: `https://<resource>.openai.azure.com/`
 4. API version is supported (e.g., `2024-08-01-preview`)
