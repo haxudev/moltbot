@@ -103,7 +103,12 @@ vi.mock("../memory/manager.js", () => ({
         sourceCounts: [{ source: "memory", files: 2, chunks: 3 }],
         cache: { enabled: true, entries: 10, maxEntries: 500 },
         fts: { enabled: true, available: true },
-        vector: { enabled: true, available: true, extensionPath: "/opt/vec0.dylib", dims: 1024 },
+        vector: {
+          enabled: true,
+          available: true,
+          extensionPath: "/opt/vec0.dylib",
+          dims: 1024,
+        },
       }),
       close: vi.fn(async () => {}),
       __agentId: agentId,
