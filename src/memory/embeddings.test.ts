@@ -166,6 +166,84 @@ describe("embedding provider remote overrides", () => {
     expect(headers["x-goog-api-key"]).toBe("gemini-key");
     expect(headers["Content-Type"]).toBe("application/json");
   });
+
+  it("builds Azure OpenAI embeddings URL with api-version and api-key header", async () => {
+    const fetchMock = createFetchMock();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { createEmbeddingProvider } = await import("./embeddings.js");
+    const authModule = await import("../agents/model-auth.js");
+    vi.mocked(authModule.resolveApiKeyForProvider).mockResolvedValue({
+      apiKey: "azure-provider-key",
+      mode: "api-key",
+      source: "test",
+    });
+
+    const result = await createEmbeddingProvider({
+      config: {} as never,
+      provider: "azure-openai",
+      remote: {
+        baseUrl:
+          "https://my-resource.openai.azure.com/openai/deployments/my-deploy?api-version=2023-05-15",
+      },
+      model: "",
+      fallback: "none",
+    });
+
+    await result.provider.embedQuery("hello");
+
+    expect(authModule.resolveApiKeyForProvider).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(
+      "https://my-resource.openai.azure.com/openai/deployments/my-deploy/embeddings?api-version=2023-05-15",
+    );
+    const headers = (init?.headers ?? {}) as Record<string, string>;
+    expect(headers["api-key"]).toBe("azure-provider-key");
+    expect(headers["Content-Type"]).toBe("application/json");
+  });
+
+  it("does not append /embeddings when Azure baseUrl already includes it", async () => {
+    const fetchMock = createFetchMock();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { createEmbeddingProvider } = await import("./embeddings.js");
+
+    const result = await createEmbeddingProvider({
+      config: {} as never,
+      provider: "azure-openai",
+      remote: {
+        baseUrl:
+          "https://my-resource.openai.azure.com/openai/deployments/my-deploy/embeddings?api-version=2023-05-15",
+        apiKey: "azure-key",
+      },
+      model: "",
+      fallback: "none",
+    });
+
+    await result.provider.embedQuery("hello");
+
+    const [url] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe(
+      "https://my-resource.openai.azure.com/openai/deployments/my-deploy/embeddings?api-version=2023-05-15",
+    );
+  });
+
+  it("throws a helpful error when Azure baseUrl is missing api-version", async () => {
+    const { createEmbeddingProvider } = await import("./embeddings.js");
+
+    await expect(
+      createEmbeddingProvider({
+        config: {} as never,
+        provider: "azure-openai",
+        remote: {
+          baseUrl: "https://my-resource.openai.azure.com/openai/deployments/my-deploy",
+          apiKey: "azure-key",
+        },
+        model: "",
+        fallback: "none",
+      }),
+    ).rejects.toThrow(/api-version/i);
+  });
 });
 
 describe("embedding provider auto selection", () => {

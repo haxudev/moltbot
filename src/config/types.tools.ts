@@ -234,7 +234,7 @@ export type MemorySearchConfig = {
     sessionMemory?: boolean;
   };
   /** Embedding provider mode. */
-  provider?: "openai" | "gemini" | "local";
+  provider?: "openai" | "gemini" | "local" | "azure-openai";
   remote?: {
     baseUrl?: string;
     apiKey?: string;

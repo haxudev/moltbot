@@ -66,6 +66,7 @@ Semantic memory search uses **embedding APIs** when configured for remote provid
 
 - `memorySearch.provider = "openai"` → OpenAI embeddings
 - `memorySearch.provider = "gemini"` → Gemini embeddings
+- `memorySearch.provider = "azure-openai"` → Azure OpenAI embeddings
 - Optional fallback to OpenAI if local embeddings fail
 
 You can keep it local with `memorySearch.provider = "local"` (no API usage).

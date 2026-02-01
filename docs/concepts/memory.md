@@ -166,6 +166,35 @@ agents: {
 }
 ```
 
+### Azure OpenAI embeddings
+
+Set the provider to `azure-openai` to use Azure OpenAI embeddings (deployment-based endpoints):
+
+```json5
+agents: {
+  defaults: {
+    memorySearch: {
+      provider: "azure-openai",
+      remote: {
+        // Must include api-version (Azure requirement)
+        baseUrl:
+          "https://{resource}.openai.azure.com/openai/deployments/{deployment}?api-version=2023-05-15",
+        // Optional: if omitted, OpenClaw uses AZURE_OPENAI_API_KEY (or auth profiles)
+        apiKey: "YOUR_AZURE_OPENAI_API_KEY",
+        // Optional: extra headers
+        headers: { "X-Client-Request-Id": "..." }
+      }
+    }
+  }
+}
+```
+
+Notes:
+- Azure uses `api-key` authentication (not `Authorization: Bearer ...`).
+- `memorySearch.remote.baseUrl` can be either the deployment root URL or the full embeddings URL.
+  OpenClaw will append `/embeddings` if it’s missing.
+- Azure does **not** use the OpenAI Batch API for memory indexing; `remote.batch.*` is ignored.
+
 If you don't want to set an API key, use `memorySearch.provider = "local"` or set
 `memorySearch.fallback = "none"`.
 

@@ -1212,6 +1212,11 @@ If you’d rather stay local, set `memorySearch.provider = "local"` (and optiona
 `memorySearch.remote.apiKey`). We support **OpenAI, Gemini, or local** embedding
 models - see [Memory](/concepts/memory) for the setup details.
 
+If you want Azure OpenAI embeddings, set `memorySearch.provider = "azure-openai"` and
+set `memorySearch.remote.baseUrl` to your Azure deployments endpoint **including**
+`?api-version=...` (Azure requirement). OpenClaw will use `AZURE_OPENAI_API_KEY` by
+default (or `memorySearch.remote.apiKey`).
+
 ### Does memory persist forever What are the limits
 
 Memory files live on disk and persist until you delete them. The limit is your
